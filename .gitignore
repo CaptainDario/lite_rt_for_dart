@@ -83,3 +83,7 @@ example/object_detection_ssd_mobilenet/assets/models/ssd_mobilenet.tflite
 **/assets/models/**
 **/assets/models/!README
 **/assets/models/.gitkeep
+
+# testing files
+test/*
+!test/*_test.dart
