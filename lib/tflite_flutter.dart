@@ -22,4 +22,4 @@ export 'src/util/byte_conversion_utils.dart';
 export 'src/util/list_shape_extension.dart';
 
 /// tflite version information.
-String get version => tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString();
+String get tfLiteVersion => tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString();
