@@ -31,22 +31,19 @@ New features from the official implementation will also be integrated in this fo
 
 ## Example
 
-### Import the libraries
+### Import and initialize the library
 
 In the dependency section of `pubspec.yaml` file, add `tflite_flutter: <your version>`
 
-### Import
-
 ```dart
 import 'package:tflite_flutter/tflite_flutter.dart';
-```
 
-### Creating an Interpreter
+// IMPORTANT: initialize the plugin
+initLiteRT("path/to/your/lib_tflite")
 
-Place `your_model.tflite` in `assets` directory. Make sure to include assets in `pubspec.yaml`.
+// Load a model from file
+final interpreter = await Interpreter.fromFile('path/to/you/model.tflite');
 
-```dart
-final interpreter = await Interpreter.fromAsset('assets/your_model.tflite');
 ```
 
 Refer to the documentation for info on creating interpreter from a buffer or a file.
