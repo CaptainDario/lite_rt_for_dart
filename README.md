@@ -1,27 +1,35 @@
  <p align="center">
     <br>
-    <img src="https://github.com/am15h/tflite_flutter_plugin/raw/update_readme/docs/tflite_flutter_cover.png"/>
+    <img src="./.github/readme/lite_rt_dart.jpg"/>
     </br>
 </p>
 
-## RT Lite (TF Lite) for dart
+**IMPORTANT, READ THIS BEFORE USING THIS PLUGIN!**
+* **This is NOT an official implementation, [Google's official plugin is here](https://pub.dev/packages/tflite_flutter)**
+  * For proper support please use that plugin
+* **I create this plugin to use in my own applications as I encountered various difficulties with the official plugin.**
+  * Therefore, the main use case is that it works in my own applications, but it may be useful for others, which is why I opened sourced it.
 
-**This is not an official implementation, [Google's official plugin is here](https://pub.dev/packages/tflite_flutter)**
+## LiteRT (TF Lite) for dart
 
-This plugin provides bindings for RT Lite (formerly tf lite) for standalone dart.
+This plugin provides bindings for LiteRT (formerly TF lite) for standalone dart.
 
 ## Why another plugin?
 
 This fork of the official plugin tries to improve upon the official implementation in a few key areas:
 
 * Dart standalone support
-* Easier and better binary handling
-* Up-to-date binaries
-* Better desktop support
+* Improved binary handling
+  * Up-to-date binaries
+  * Easily switch between binaries
+* Improved platform support
+  * Linux arm 64
+  * Windows arm 64
+  * Web support is planned
 
 New features from the official implementation will also be integrated in this fork.
 
-## Usage instructions
+## Example
 
 ### Import the libraries
 
@@ -33,69 +41,77 @@ In the dependency section of `pubspec.yaml` file, add `tflite_flutter: <your ver
 import 'package:tflite_flutter/tflite_flutter.dart';
 ```
 
-### Creating the Interpreter
+### Creating an Interpreter
 
-- **From asset**
+Place `your_model.tflite` in `assets` directory. Make sure to include assets in `pubspec.yaml`.
 
-    Place `your_model.tflite` in `assets` directory. Make sure to include assets in `pubspec.yaml`.
+```dart
+final interpreter = await Interpreter.fromAsset('assets/your_model.tflite');
+```
 
-    ```dart
-    final interpreter = await Interpreter.fromAsset('assets/your_model.tflite');
-    ```
-
-Refer to the documentation for info on creating interpreter from buffer or file.
+Refer to the documentation for info on creating interpreter from a buffer or a file.
 
 ### Performing inference
 
-- **For single input and output**
+<details>
+<summary>For single input and output</summary>
 
-    Use `void run(Object input, Object output)`.
+Use `void run(Object input, Object output)`.
 
-    ```dart
-    // For ex: if input tensor shape [1,5] and type is float32
-    var input = [[1.23, 6.54, 7.81, 3.21, 2.22]];
+```dart
+// For ex: if input tensor shape [1,5] and type is float32
+var input = [[1.23, 6.54, 7.81, 3.21, 2.22]];
 
-    // if output tensor shape [1,2] and type is float32
-    var output = List.filled(1*2, 0).reshape([1,2]);
+// if output tensor shape [1,2] and type is float32
+var output = List.filled(1*2, 0).reshape([1,2]);
 
-    // inference
-    interpreter.run(input, output);
+// inference
+interpreter.run(input, output);
 
-    // print the output
-    print(output);
-    ```
+// print the output
+print(output);
+```
+
+</details>
   
-- **For multiple inputs and outputs**
+#### 
 
-    Use `void runForMultipleInputs(List<Object> inputs, Map<int, Object> outputs)`.
+<details>
+<summary>For multiple inputs and outputs</summary>
 
-    ```dart
-    var input0 = [1.23];  
-    var input1 = [2.43];  
+Use `void runForMultipleInputs(List<Object> inputs, Map<int, Object> outputs)`.
 
-    // input: List<Object>
-    var inputs = [input0, input1, input0, input1];  
+```dart
+var input0 = [1.23];  
+var input1 = [2.43];  
 
-    var output0 = List<double>.filled(1, 0);  
-    var output1 = List<double>.filled(1, 0);
+// input: List<Object>
+var inputs = [input0, input1, input0, input1];  
 
-    // output: Map<int, Object>
-    var outputs = {0: output0, 1: output1};
+var output0 = List<double>.filled(1, 0);  
+var output1 = List<double>.filled(1, 0);
 
-    // inference  
-    interpreter.runForMultipleInputs(inputs, outputs);
+// output: Map<int, Object>
+var outputs = {0: output0, 1: output1};
 
-    // print outputs
-    print(outputs)
-    ```
+// inference  
+interpreter.runForMultipleInputs(inputs, outputs);
 
-### Closing the interpreter
+// print outputs
+print(outputs)
+```
+
+</details>
+
+#### Closing the interpreter
 
 ```dart
 interpreter.close();
 ```
 
 ### Asynchronous Inference with `IsolateInterpreter`
+
+<details>
 
 To utilize asynchronous inference, first create your `Interpreter` and then wrap it with `IsolateInterpreter`.
 
@@ -114,6 +130,12 @@ await isolateInterpreter.runForMultipleInputs(inputs, outputs);
 
 By using `IsolateInterpreter`, the inference runs in a separate isolate. This ensures that the main isolate, responsible for UI tasks, remains unblocked and responsive.
 
+</details>
+
+## Development
+
+<details>
+
 ### Generated code
 
 This package uses [ffigen](https://pub.dev/packages/ffigen) to generate FFI bindings. To run code generation, you can use the following melos command:
@@ -121,3 +143,5 @@ This package uses [ffigen](https://pub.dev/packages/ffigen) to generate FFI bind
 ```sh
 melos run ffigen 
 ```
+
+</details>
