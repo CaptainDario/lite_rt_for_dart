@@ -32,6 +32,7 @@ void initLiteRT(String libraryPath, {
 
   tfliteBinding = TensorFlowLiteBindings(loadLiteRTLib(libraryPath));
 
+  // add gpu delegate if set
   if(gpuDelegatelibraryPath != null){
     tfliteBindingGpu = TensorFlowLiteBindings(loadLiteRTLib(gpuDelegatelibraryPath));
   }
