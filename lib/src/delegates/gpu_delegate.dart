@@ -19,7 +19,7 @@ import 'package:ffi/ffi.dart';
 import 'package:quiver/check.dart';
 import 'package:lite_rt_for_dart/src/bindings/bindings.dart';
 import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
-import 'package:lite_rt_for_dart/tflite_flutter.dart';
+import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 
 /// GPU delegate for Android
 class GpuDelegateV2 implements Delegate {

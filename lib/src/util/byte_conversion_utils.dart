@@ -18,7 +18,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:lite_rt_for_dart/tflite_flutter.dart';
+import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 
 class ByteConversionError extends ArgumentError {
   ByteConversionError({

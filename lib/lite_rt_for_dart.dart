@@ -25,7 +25,7 @@ export 'src/util/list_shape_extension.dart';
 /// tflite version information.
 String get tfLiteVersion => tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString();
 
-/// This is important initial setup
+/// Call this **before** using any methods of this package
 void initLiteRT(String libraryPath, {
     String? gpuDelegatelibraryPath
   }){
