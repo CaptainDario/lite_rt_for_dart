@@ -38,17 +38,17 @@ This fork of the official plugin tries to improve upon the official implementati
 
 New features from the official implementation will also be integrated in this fork.
 
-## Import
-
-```dart
-import 'package:tflite_flutter/tflite_flutter.dart';
-```
-
 ## Usage instructions
 
 ### Import the libraries
 
 In the dependency section of `pubspec.yaml` file, add `tflite_flutter: <your version>`
+
+### Import
+
+```dart
+import 'package:tflite_flutter/tflite_flutter.dart';
+```
 
 ### Creating the Interpreter
 
@@ -130,15 +130,6 @@ await isolateInterpreter.runForMultipleInputs(inputs, outputs);
 ```
 
 By using `IsolateInterpreter`, the inference runs in a separate isolate. This ensures that the main isolate, responsible for UI tasks, remains unblocked and responsive.
-
-## Contribute to this package
-
-This package is managed using [melos](https://pub.dev/packages/melos). Before starting to work on the project, make sure to run the bootstrap command.
-
-```sh
-dart pub global activate melos # Install or activate melos globally
-melos bootstrap # Initialize the workspace and bootstrap the package
-```
 
 ### Generated code
 
