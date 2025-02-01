@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 
 
 

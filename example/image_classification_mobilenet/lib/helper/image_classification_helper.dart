@@ -21,7 +21,7 @@ import 'dart:isolate';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:lite_rt_for_dart/tflite_flutter.dart';
 
 import 'isolate_inference.dart';
 
@@ -56,7 +56,8 @@ class ImageClassificationHelper {
     }
 
     // Load model from assets
-    interpreter = await Interpreter.fromAsset(modelPath, options: options);
+    // TODO init interpreter
+    //interpreter = await Interpreter.fromAsset(modelPath, options: options);
     // Get tensor input shape [1, 224, 224, 3]
     inputTensor = interpreter.getInputTensors().first;
     // Get tensor output shape [1, 1001]

@@ -34,16 +34,16 @@ New features from the official implementation will also be integrated in this fo
 
 ### Import and initialize the library
 
-In the dependency section of `pubspec.yaml` file, add `tflite_flutter: <your version>`
+In the dependency section of `pubspec.yaml` file, add `lite_rt_for_dart: <your version>`
 
 ```dart
-import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:lite_rt_for_dart/tflite_flutter.dart';
 
 // IMPORTANT: initialize the plugin
 initLiteRT("path/to/your/lib_tflite")
 
 // Load a model from file
-final interpreter = await Interpreter.fromFile('path/to/you/model.tflite');
+final interpreter = await Interpreter.fromFile('path/to/your/model.tflite');
 
 ```
 
