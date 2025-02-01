@@ -7,7 +7,7 @@
 **IMPORTANT, READ THIS BEFORE USING THIS PLUGIN!**
 * **This is NOT an official implementation, [Google's official plugin is here](https://pub.dev/packages/tflite_flutter)**
   * For proper support please use that plugin
-* **I create this plugin to use in my own applications as I encountered various difficulties with the official plugin.**
+* **I created this plugin to use in my own applications as I encountered various difficulties with the official plugin.**
   * Therefore, the main use case is that it works in my own applications, but it may be useful for others, which is why I opened sourced it.
 
 ## LiteRT (TF Lite) for dart
