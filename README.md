@@ -21,144 +21,22 @@
 </a>
 </p>
 
-## Announcement
+## RT Lite (TF Lite) for dart
 
-Update: 26 April, 2023
+**This is not an official implementation, [Google's official plugin is here](https://pub.dev/packages/tflite_flutter)**
 
-This repo is a TensorFlow managed fork of the [tflite_flutter_plugin](https://github.com/am15h/tflite_flutter_plugin) project by the amazing Amish Garg. The goal of this project is to support our Flutter community in creating machine-learning backed apps with the TensorFlow Lite framework.
+This plugin provides bindings for RT Lite (formerly tf lite) for standalone dart.
 
-This project is currently a work-in-progress as we update it to create a working plugin that meets the latest and greatest Flutter and TensorFlow Lite standards. That said, *pull requests and contributions are more than welcome* and will be reviewed by TensorFlow or Flutter team members. We thank you for your understanding as we make progress on this update.
+## Why another plugin?
 
-Feel free to reach out to us by posting in the issues or discussion areas.
+This fork of the official plugin tries to improve upon the official implementation in a few key areas:
 
-Thanks!
+* Dart standalone support
+* Easier and better binary handling
+* Up-to-date binaries
+* Better desktop support
 
-- PaulTR
-
-## Overview
-
-TensorFlow Lite Flutter plugin provides a flexible and fast solution for accessing TensorFlow Lite interpreter and performing inference. The API is similar to the TFLite Java and Swift APIs. It directly binds to TFLite C API making it efficient (low-latency). Offers acceleration support using NNAPI, GPU delegates on Android, Metal and CoreML delegates on iOS, and XNNPack delegate on Desktop platforms.
-
-## Key Features
-
-- Multi-platform Support for Android and iOS
-- Flexibility to use any TFLite Model.
-- Acceleration using multi-threading.
-- Similar structure as TensorFlow Lite Java API.
-- Inference speeds close to native Android Apps built using the Java API.
-- Run inference in different isolates to prevent jank in UI thread.
-
-## (Important) Initial setup : Add dynamic libraries to your app
-
-### Android & iOS
-
-Examples and support now support dynamic library downloads! iOS samples can be run with the commands
-
-`flutter build ios` & `flutter install ios` from their respective iOS folders.
-
-Android can be run with the commands
-
-`flutter build android` & `flutter install android`
-
-while devices are plugged in.
-
-Note: This requires a device with a minimum API level of 26.
-
-Note: TFLite may not work in the iOS simulator. It's recommended that you test with a physical device.
-
-When creating a release archive (IPA), the symbols are stripped by Xcode, so the command `flutter build ipa` may throw a `Failed to lookup symbol ... symbol not found` error. To work around this:
-
-1. In Xcode, go to **Target Runner > Build Settings > Strip Style**
-2. Change from **All Symbols** to **Non-Global Symbols**
-
-### MacOS
-
-For MacOS a TensorFlow Lite dynamic library needs to be added to the project manually.
-For this, first a `.dylib` needs to be built. You can follow the [Bazel build guide](https://www.tensorflow.org/lite/guide/build_arm) or the [CMake build guide](https://www.tensorflow.org/lite/guide/build_cmake) to build the libraries.
-
-**CMake Note:**
-
-- cross compiling in CMake can be achieved using:
-`-DCMAKE_OSX_ARCHITECTURES=x86_64|arm64`
-
-- bundling two architectures (arm / x86) using lipo:
-`lipo -create arm64/libtensorflowlite_c.dylib x86/libtensorflowlite_c.dylib -output libtensorflowlite_c.dylib`
-
-As a second step, the library needs to be added to your application's XCode project. For this, you can follow the step 1 and 2 of the [official Flutter guide on adding dynamic libraries](https://docs.flutter.dev/platform-integration/macos/c-interop#compiled-dynamic-library-macos).
-
-### Linux
-
-For Linux a TensorFlow Lite dynamic library needs to be added to the project manually.
-For this, first a `.so` needs to be built. You can follow the [Bazel build guide](https://www.tensorflow.org/lite/guide/build_arm) or the [CMake build guide](https://www.tensorflow.org/lite/guide/build_cmake) to build the libraries.
-
-As a second step, the library needs to be added to your application's project. This is a simple procedure
-
-1. Create a folder called `blobs` in the top level of your project
-2. Copy the `libtensorflowlite_c.so` to this folder
-3. Rename the file matching you architecture
-   1. arm -> `libtensorflowlite_c_arm64.so`
-   2. x86 -> `libtensorflowlite_c_x86.so`
-4. Append following lines to your `linux/CMakeLists.txt`
-
-``` Make
-...
-
-# get tf lite binaries
-message(STATUS "TF Lite detected processor architecture: ${CMAKE_SYSTEM_PROCESSOR}")
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
-    set(TF_LITE_SO ${PROJECT_BUILD_DIR}/../blobs/libtensorflowlite_c_arm64.so)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-    set(TF_LITE_SO ${PROJECT_BUILD_DIR}/../blobs/libtensorflowlite_c_x86.so)
-endif()
-
-install(
-  FILES
-    ${TF_LITE_SO}
-  DESTINATION
-    ${INSTALL_BUNDLE_DATA_DIR}/../blobs/
-  RENAME
-  libtensorflowlite_c-linuxlibtensorflowlite_c-linux.so
-)
-```
-
-### Windows
-
-For Windows a TensorFlow Lite dynamic library needs to be added to the project manually.
-For this, first a `.dll` needs to be built. You can follow the [Bazel build guide](https://www.tensorflow.org/lite/guide/build_arm) or the [CMake build guide](https://www.tensorflow.org/lite/guide/build_cmake) to build the libraries.
-
-As a second step, the library needs to be added to your application's project. This is a simple procedure
-
-1. Create a folder called `blobs` in the top level of your project
-2. Copy the `libtensorflowlite_c.dll` to this folder
-3. Rename the file matching you architecture
-   1. arm -> `libtensorflowlite_c_arm64.dll`
-   2. x86 -> `libtensorflowlite_c_x86.dll`
-4. Append following lines to your `windows/CMakeLists.txt`
-
-``` Make
-...
-
-# get tf lite binaries
-message(STATUS "TF Lite detected processor architecture: ${CMAKE_SYSTEM_PROCESSOR}")
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
-    set(TF_LITE_DLL ${PROJECT_BUILD_DIR}/../blobs/libtensorflowlite_c_arm64.dll)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-    set(TF_LITE_DLL ${PROJECT_BUILD_DIR}/../blobs/libtensorflowlite_c_x86.dll)
-endif()
-
-install(
-  FILES
-    ${TF_LITE_DLL}
-  DESTINATION
-    ${INSTALL_BUNDLE_DATA_DIR}/../blobs/
-  RENAME
-  libtensorflowlite_c-win.dll
-)
-```
-
-## TFLite Flutter Helper Library
-
-The helper library has been deprecated. New development underway for a replacement at <https://github.com/google/flutter-mediapipe>. Current timeline is to have wide support by the end of August, 2023.
+New features from the official implementation will also be integrated in this fork.
 
 ## Import
 
@@ -170,7 +48,7 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 
 ### Import the libraries
 
-In the dependency section of `pubspec.yaml` file, add `tflite_flutter: ^0.10.1` (adjust the version accordingly based on the latest release)
+In the dependency section of `pubspec.yaml` file, add `tflite_flutter: <your version>`
 
 ### Creating the Interpreter
 
