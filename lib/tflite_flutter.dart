@@ -7,6 +7,7 @@ library tflite_flutter;
 
 import 'package:ffi/ffi.dart';
 import 'package:tflite_flutter/src/bindings/bindings.dart';
+import 'package:tflite_flutter/src/bindings/tensorflow_lite_bindings_generated.dart';
 
 export 'src/delegate.dart';
 export 'src/delegates/gpu_delegate.dart';
@@ -23,3 +24,16 @@ export 'src/util/list_shape_extension.dart';
 
 /// tflite version information.
 String get tfLiteVersion => tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString();
+
+/// This is important initial setup
+void initLiteRT(String libraryPath, {
+    String? gpuDelegatelibraryPath
+  }){
+
+  tfliteBinding = TensorFlowLiteBindings(loadLiteRTLib(libraryPath));
+
+  if(gpuDelegatelibraryPath != null){
+    tfliteBindingGpu = TensorFlowLiteBindings(loadLiteRTLib(gpuDelegatelibraryPath));
+  }
+
+}
