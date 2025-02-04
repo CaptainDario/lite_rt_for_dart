@@ -19,27 +19,6 @@ import 'dart:io';
 
 import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
 
-/// Loads the LiteRT runtime from the given library path
-DynamicLibrary loadLiteRTLib (String libraryPath) {
-  if (Platform.isAndroid) {
-    return DynamicLibrary.open('libtensorflowlite_jni.so');
-  }
-  if (Platform.isIOS) {
-    return DynamicLibrary.process();
-  }
-  if (Platform.isMacOS) {
-    return DynamicLibrary.open('libtflite_c.dylib');
-  }
-  if (Platform.isLinux) {
-    return DynamicLibrary.open('libtflite_c.so');
-  }
-  if (Platform.isWindows) {
-    return DynamicLibrary.open('libtflite_c.dll');
-  }
-
-  throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
-}
-
 final DynamicLibrary _dylibGpu = () {
   
   if (Platform.isAndroid) {
