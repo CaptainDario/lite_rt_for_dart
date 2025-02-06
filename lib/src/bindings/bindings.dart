@@ -17,6 +17,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
 
 final DynamicLibrary _dylibGpu = () {
@@ -31,8 +32,30 @@ final DynamicLibrary _dylibGpu = () {
   throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
 }();
 
+/// Have the tflite bindings been initialized
+bool _tfliteBindingInitialized = false;
+/// Have the tflite bindings been initialized
+bool get tfliteBindingInitialized => _tfliteBindingInitialized;
 /// TensorFlowLite Bindings
-late final TensorFlowLiteBindings tfliteBinding;
+late final TensorFlowLiteBindings _tfliteBinding;
+/// TensorFlowLite Bindings
+TensorFlowLiteBindings get tfliteBinding {
+
+  if(!tfliteBindingInitialized){
+    try {
+      _tfliteBinding = TensorFlowLiteBindings(DynamicLibrary.open(
+        libTfLiteBasePath));
+      _tfliteBindingInitialized = true;
+    }
+    catch (e) {
+      print("The given path: $libTfLiteBasePath does not contain a valid TF Lite runtime!");
+      throw Exception(e);
+    }
+  }
+
+  return _tfliteBinding;
+
+}
 
 /// TensorFlowLite Gpu Bindings
 late final TensorFlowLiteBindings tfliteBindingGpu;

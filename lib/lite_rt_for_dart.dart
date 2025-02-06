@@ -5,57 +5,53 @@
 /// TensorFlow Lite for Flutter
 library lite_rt_for_dart;
 
-import 'dart:ffi';
-
-import 'package:ffi/ffi.dart';
-import 'package:lite_rt_for_dart/src/bindings/bindings.dart';
-import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
-
 export 'src/delegate.dart';
 export 'src/delegates/gpu_delegate.dart';
 export 'src/delegates/metal_delegate.dart';
 export 'src/delegates/xnnpack_delegate.dart';
 export 'src/delegates/coreml_delegate.dart';
-export 'src/interpreter.dart';
-export 'src/interpreter_options.dart';
-export 'src/isolate_interpreter.dart';
+export 'src/interpreter/interpreter.dart';
+export 'src/interpreter/isolate_interpreter.dart';
+export 'src/interpreter/interpreter_options.dart';
 export 'src/quanitzation_params.dart';
 export 'src/tensor.dart';
 export 'src/util/byte_conversion_utils.dart';
 export 'src/util/list_shape_extension.dart';
 
-/// tflite version information.
-String get tfLiteVersion => tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString();
 
-/// Call this or `` **before** using any methods of this package
-/// 
-/// Pass a path to a tf lite dynmic library
-void initLiteRT(String libraryPath, {
-    String? gpuDelegatelibraryPath
-  }){
 
-  tfliteBinding = TensorFlowLiteBindings(DynamicLibrary.open(libraryPath));
+/// The path to the library which contains that base LiteRT
+String? _libTfLiteBasePath;
+/// The path to the library which contains that base LiteRT
+String get libTfLiteBasePath {
 
-  // add gpu delegate if set
-  if(gpuDelegatelibraryPath != null){
-    tfliteBindingGpu = TensorFlowLiteBindings(
-      DynamicLibrary.open(gpuDelegatelibraryPath));
+  if(_libTfLiteBasePath == null){
+    throw Exception("LiteRT has not been initialized! Run `initLiteRT` first!");
   }
 
+  return _libTfLiteBasePath!;
 }
 
-/// Call this or `initLiteRT` **before** using any methods of this package
+/// Call this **before** using any methods of this package
 /// 
-/// Pass a DynamicLibrary that holds the TFLite runtime symbols
-void initLiteRTFromLib(DynamicLibrary library, {
-    DynamicLibrary? gpuDelegatelibrary
+/// `libraryPath` should be a path to a tensorflow lite dynamic library
+/// `gpuDelegatelibraryPath` should be a path to a tensorflow lite gpu delegate
+/// dynamic library
+/// `loadLibs` controls if the tf lite libraries should be loaded into memory
+/// when calling `initLiteRT`. If set to false loads the libraries
+/// when the first call to TFLite is being made.
+/// If you intend to use this package in an isolate, set keep this set to false
+void initLiteRT(String libraryPath, {
+    String? gpuDelegatelibraryPath,
+    bool loadLibs = false
   }){
 
-  tfliteBinding = TensorFlowLiteBindings(library);
+  _libTfLiteBasePath = libraryPath;
+  // TODO GPU LIB
+  // TODO FLEX LIB
 
-  // add gpu delegate if set
-  if(gpuDelegatelibrary != null){
-    tfliteBindingGpu = TensorFlowLiteBindings(gpuDelegatelibrary);
+  if(loadLibs){
+
   }
 
 }
