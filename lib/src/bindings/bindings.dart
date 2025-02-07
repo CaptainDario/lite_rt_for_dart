@@ -20,6 +20,11 @@ import 'dart:io';
 import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
 
+
+/// if a library path is set to this value, the `DynamicLibrary` shoudl be
+/// loaded with `DynamicLibrary.process()`
+String shouldUseDynamicLibraryProcess = "DynamicLibrary.process();";
+
 final DynamicLibrary _dylibGpu = () {
   
   if (Platform.isAndroid) {
@@ -43,9 +48,17 @@ TensorFlowLiteBindings get tfliteBinding {
 
   if(!tfliteBindingInitialized){
     try {
-      _tfliteBinding = TensorFlowLiteBindings(DynamicLibrary.open(
-        libTfLiteBasePath));
+      
+      DynamicLibrary dl;
+
+      // check if the library should be loaded from path or not
+      if(libTfLiteBasePath == shouldUseDynamicLibraryProcess) dl = DynamicLibrary.process();
+      else dl = DynamicLibrary.open(libTfLiteBasePath);
+      
+      _tfliteBinding = TensorFlowLiteBindings(dl);
+      
       _tfliteBindingInitialized = true;
+
     }
     catch (e) {
       print("The given path: $libTfLiteBasePath does not contain a valid TF Lite runtime!");
