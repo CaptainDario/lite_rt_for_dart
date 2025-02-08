@@ -35,6 +35,11 @@ class InterpreterOptions {
   factory InterpreterOptions() =>
       InterpreterOptions._(tfliteBinding.TfLiteInterpreterOptionsCreate());
 
+  /// Creates an instance from a raw pointer address.
+  factory InterpreterOptions.fromAddress(int address) {
+    return InterpreterOptions._(Pointer.fromAddress(address));
+  }
+
   /// Destroys the options instance.
   void delete() {
     checkState(!_deleted, message: 'InterpreterOptions already deleted.');
