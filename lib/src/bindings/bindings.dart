@@ -15,8 +15,8 @@
  */
 
 import 'dart:ffi';
-import 'dart:io';
 
+import 'package:ffi/ffi.dart';
 import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
 
@@ -49,6 +49,7 @@ TensorFlowLiteBindings get tfliteBinding {
       
       _tfliteBindingInitialized = true;
 
+      print("Loaded LiteRT ${_tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString()} from ${libTfLiteBasePath}");
     }
     catch (e) {
       print("The given path: $libTfLiteBasePath does not contain a valid TF Lite runtime!");
