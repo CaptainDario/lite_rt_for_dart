@@ -5,7 +5,7 @@ import 'dart:isolate';
 
 import 'package:lite_rt_for_dart/lite_rt_for_dart.dart';
 
-/// All names that are valid interpreter functions
+/// All names that are valid `Interpreter` functions
 enum InterpreterFunctionNames {
   allocateTensors,
   invoke,
@@ -22,8 +22,16 @@ enum InterpreterFunctionNames {
   resetVariableTensors
 }
 
+/// All names that are valid `Interpreter` members
+enum InterpreterAttributeNames {
+  address,
+  isAllocated,
+  isDeleted,
+  lastNativeInferenceDurationMicroSeconds,
+}
+
 /// Class that bundles data to easily invoke functions inside an isolate
-class IsolateFunctionArguments {
+class IsolateInterpreterFunctionArguments {
 
   /// The name of the function to invoke
   final InterpreterFunctionNames name;
@@ -32,7 +40,7 @@ class IsolateFunctionArguments {
   /// the named arguments that should be passed to the isolate
   final List<dynamic>? namedArguments;
 
-  IsolateFunctionArguments({
+  IsolateInterpreterFunctionArguments({
     required this.name,
     this.positionalArguments,
     this.namedArguments
@@ -41,8 +49,29 @@ class IsolateFunctionArguments {
 }
 
 /// Maps the given `IsolateFunctionArguments` to the call that it describes
-void mapIsolateFunctionArgumentsToFunctionCall(
-  IsolateFunctionArguments iFA, Interpreter interpreter,
+void mapNameToMember(
+  InterpreterAttributeNames iAN, Interpreter interpreter,
+  SendPort sendToMainIsolatePort){
+  
+  switch (iAN) {
+    case InterpreterAttributeNames.address:
+      sendToMainIsolatePort.send(interpreter.address);
+      break;
+    case InterpreterAttributeNames.isAllocated:
+      sendToMainIsolatePort.send(interpreter.isAllocated);
+      break;
+    case InterpreterAttributeNames.isDeleted:
+      sendToMainIsolatePort.send(interpreter.isDeleted);
+      break;
+    case InterpreterAttributeNames.lastNativeInferenceDurationMicroSeconds:
+      sendToMainIsolatePort.send(interpreter.lastNativeInferenceDurationMicroSeconds);
+      break;
+  }
+}
+
+/// Maps the given `IsolateFunctionArguments` to the call that it describes
+void mapNameAndArgsToFunctionCall(
+  IsolateInterpreterFunctionArguments iFA, Interpreter interpreter,
   SendPort sendToMainIsolatePort){
 
   final args      = iFA.positionalArguments;

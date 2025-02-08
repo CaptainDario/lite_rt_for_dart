@@ -146,8 +146,11 @@ class IsolateInterpreter {
 
     // listen for inference requests or closing the isolate
     await for (final data in receiveQueue.rest) {
-      if(data is IsolateFunctionArguments){
-        mapIsolateFunctionArgumentsToFunctionCall(data, interpreter, sendToMainIsolatePort);
+      if(data is IsolateInterpreterFunctionArguments){
+        mapNameAndArgsToFunctionCall(data, interpreter, sendToMainIsolatePort);
+      }
+      if(data is InterpreterAttributeNames){
+        mapNameToMember(data, interpreter, sendToMainIsolatePort);
       }
       // break the loop
       if(data == null){
