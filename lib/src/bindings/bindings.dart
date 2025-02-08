@@ -25,17 +25,7 @@ import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated
 /// loaded with `DynamicLibrary.process()`
 String shouldUseDynamicLibraryProcess = "DynamicLibrary.process();";
 
-final DynamicLibrary _dylibGpu = () {
-  
-  if (Platform.isAndroid) {
-    return DynamicLibrary.open('libtensorflowlite_gpu_jni.so');
-  }
-  // TODO MacOS
-  // TODO Linux
-  // TODO Windows
 
-  throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
-}();
 
 /// Have the tflite bindings been initialized
 bool _tfliteBindingInitialized = false;
@@ -70,5 +60,74 @@ TensorFlowLiteBindings get tfliteBinding {
 
 }
 
-/// TensorFlowLite Gpu Bindings
-late final TensorFlowLiteBindings tfliteBindingGpu;
+
+/// Have the tflite bindings been initialized
+bool _tfliteGpuDelegateBindingInitialized = false;
+/// Have the tflite bindings been initialized
+bool get tfliteGpuDelegateBindingInitialized => _tfliteGpuDelegateBindingInitialized;
+/// TensorFlowLite Bindings
+late final TensorFlowLiteBindings _tfliteGpuDelegateBinding;
+/// TensorFlowLite Bindings
+TensorFlowLiteBindings get tfliteGpuDelegateBinding {
+
+  if(!tfliteGpuDelegateBindingInitialized){
+    try {
+      
+      DynamicLibrary dl;
+
+      // check if the library should be loaded from path or not
+      if(libTfLiteGPUDelegatePath == shouldUseDynamicLibraryProcess) dl = DynamicLibrary.process();
+      else dl = DynamicLibrary.open(libTfLiteGPUDelegatePath);
+      
+      _tfliteGpuDelegateBinding = TensorFlowLiteBindings(dl);
+      
+      _tfliteGpuDelegateBindingInitialized = true;
+
+      print("Loaded TF Lite GPU Delegate from $libTfLiteGPUDelegatePath");
+
+    }
+    catch (e) {
+      print("The given path: $libTfLiteGPUDelegatePath does not contain a valid TF Lite runtime!");
+      throw Exception(e);
+    }
+  }
+
+  return _tfliteGpuDelegateBinding;
+
+}
+
+
+/// Have the tflite bindings been initialized
+bool _tfliteCoreMLDelegateBindingInitialized = false;
+/// Have the tflite bindings been initialized
+bool get tfliteCoreMLDelegateBindingInitialized => _tfliteCoreMLDelegateBindingInitialized;
+/// TensorFlowLite Bindings
+late final TensorFlowLiteBindings _tfliteCoreMLDelegateBinding;
+/// TensorFlowLite Bindings
+TensorFlowLiteBindings get tfliteCoreMLDelegateBinding {
+
+  if(!tfliteCoreMLDelegateBindingInitialized){
+    try {
+      
+      DynamicLibrary dl;
+
+      // check if the library should be loaded from path or not
+      if(libTfLiteCoreMLDelegatePath == shouldUseDynamicLibraryProcess) dl = DynamicLibrary.process();
+      else dl = DynamicLibrary.open(libTfLiteCoreMLDelegatePath);
+      
+      _tfliteCoreMLDelegateBinding = TensorFlowLiteBindings(dl);
+      
+      _tfliteCoreMLDelegateBindingInitialized = true;
+
+      print("Loaded TF Lite CoreML Delegate from $libTfLiteCoreMLDelegatePath");
+
+    }
+    catch (e) {
+      print("The given path: $libTfLiteCoreMLDelegatePath does not contain a valid TF Lite runtime!");
+      throw Exception(e);
+    }
+  }
+
+  return _tfliteCoreMLDelegateBinding;
+
+}

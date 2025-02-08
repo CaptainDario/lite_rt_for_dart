@@ -34,16 +34,16 @@ class GpuDelegate implements Delegate {
   factory GpuDelegate({GpuDelegateOptions? options}) {
     if (options == null) {
       return GpuDelegate._(
-        tfliteBinding.TFLGpuDelegateCreate(nullptr),
+        tfliteGpuDelegateBinding.TFLGpuDelegateCreate(nullptr),
       );
     }
-    return GpuDelegate._(tfliteBinding.TFLGpuDelegateCreate(options.base));
+    return GpuDelegate._(tfliteGpuDelegateBinding.TFLGpuDelegateCreate(options.base));
   }
 
   @override
   void delete() {
     checkState(!_deleted, message: 'TfLiteGpuDelegate already deleted.');
-    tfliteBinding.TFLGpuDelegateDelete(_delegate);
+    tfliteGpuDelegateBinding.TFLGpuDelegateDelete(_delegate);
     _deleted = true;
   }
 }

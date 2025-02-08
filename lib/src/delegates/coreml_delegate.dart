@@ -35,14 +35,14 @@ class CoreMlDelegate implements Delegate {
     final delegateOptions = options ?? CoreMlDelegateOptions();
 
     return CoreMlDelegate._(
-      tfliteBinding.TfLiteCoreMlDelegateCreate(delegateOptions.base),
+      tfliteCoreMLDelegateBinding.TfLiteCoreMlDelegateCreate(delegateOptions.base),
     );
   }
 
   @override
   void delete() {
     checkState(!_deleted, message: 'CoreMlDelegate already deleted.');
-    tfliteBinding.TfLiteCoreMlDelegateDelete(_delegate);
+    tfliteCoreMLDelegateBinding.TfLiteCoreMlDelegateDelete(_delegate);
     _deleted = true;
   }
 }

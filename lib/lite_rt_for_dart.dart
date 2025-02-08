@@ -32,6 +32,42 @@ String get libTfLiteBasePath {
   return _libTfLiteBasePath!;
 }
 
+/// The path to the library which contains that GPU Delegate for LiteRT
+String? _libTfLiteGPUDelegatePath;
+/// The path to the library which contains that GPU Delegate for LiteRT
+String get libTfLiteGPUDelegatePath {
+
+  if(_libTfLiteGPUDelegatePath == null){
+    throw Exception("LiteRT has not been initialized! Run `initLiteRT` first!");
+  }
+
+  return _libTfLiteGPUDelegatePath!;
+}
+
+/// The path to the library which contains that CoreML Delegate for LiteRT
+String? _libTfLiteCoreMLDelegatePath;
+/// The path to the library which contains that CoreML Delegate for LiteRT
+String get libTfLiteCoreMLDelegatePath {
+
+  if(_libTfLiteCoreMLDelegatePath == null){
+    throw Exception("LiteRT has not been initialized! Run `initLiteRT` first!");
+  }
+
+  return _libTfLiteCoreMLDelegatePath!;
+}
+
+/// The path to the library which contains that Flex Delegate for LiteRT
+String? _libTfLiteFlexDelegatePath;
+/// The path to the library which contains that Flex Delegate for LiteRT
+String get libTfLiteFlexDelegatePath {
+
+  if(_libTfLiteFlexDelegatePath == null){
+    throw Exception("LiteRT has not been initialized! Run `initLiteRT` first!");
+  }
+
+  return _libTfLiteFlexDelegatePath!;
+}
+
 /// Call this **before** using any methods of this package
 /// 
 /// `libraryPath` should be a path to a tensorflow lite dynamic library
@@ -43,15 +79,13 @@ String get libTfLiteBasePath {
 /// If you intend to use this package in an isolate, set keep this set to false
 void initLiteRT(String libraryPath, {
     String? gpuDelegatelibraryPath,
-    bool loadLibs = false
+    String? coreMLDelegatelibraryPath,
+    String? flexDelegatelibraryPath, 
   }){
 
-  _libTfLiteBasePath = libraryPath;
-  // TODO GPU LIB
-  // TODO FLEX LIB
-
-  if(loadLibs){
-
-  }
+  _libTfLiteBasePath           = libraryPath;
+  _libTfLiteGPUDelegatePath    = gpuDelegatelibraryPath;
+  _libTfLiteCoreMLDelegatePath = coreMLDelegatelibraryPath;
+  _libTfLiteFlexDelegatePath   = flexDelegatelibraryPath;
 
 }

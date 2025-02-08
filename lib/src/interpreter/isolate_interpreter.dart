@@ -37,11 +37,11 @@ import 'package:lite_rt_for_dart/src/interpreter/isolate_utils.dart';
 class IsolateInterpreter {
 
   /// File that was used to initialize this interpreter
-  File? _file;
+  File? _fromFile;
   /// Buffer that was used to initialize this interpreter
-  Uint8List? _buffer;
+  Uint8List? _fromBuffer;
   /// Address that was used to initialize this interpreter
-  int? _address;
+  int? _fromAddress;
 
   /// Name of the isolate used for inference
   final String debugName;
@@ -56,21 +56,28 @@ class IsolateInterpreter {
   /// The isolate in which the Interpreter is located
   late final Isolate _isolate;
 
+  /// The address of the interpreter Options
+  int? isolateInterpreterOptionsAddress;
   /// The memory address of the interpreter in the isolate
   late final int isolateInterpreterAddress;
 
   IsolateInterpreter._(
-    this._file,
-    this._buffer,
-    this._address,
-    this.debugName
+    this._fromFile,
+    this._fromBuffer,
+    this._fromAddress,
+    this.debugName,
+    this.isolateInterpreterOptionsAddress
   );
 
   /// private 'constructor' that the other 'constructors' use under the hood 
   static Future<IsolateInterpreter> _create(
-    File? file, Uint8List? buffer, int? address, String debugName) async {
+    File? file, Uint8List? buffer, int? address, String debugName, {
+      InterpreterOptions? options
+    }) async {
 
-    final interpreter = IsolateInterpreter._(file, buffer, address, debugName);
+    final interpreter = IsolateInterpreter._(file, buffer, address, debugName,
+      options?.base.address);
+      
     await interpreter._init();
 
     return interpreter;
@@ -80,18 +87,21 @@ class IsolateInterpreter {
   /// Instantiates an isolate interpreter from a .tflite model as `File`
   static Future<IsolateInterpreter> createFromFile(File? file, {
     String debugName = 'TfLiteInterpreterIsolate',
-  }) async => await _create(file, null, null, debugName);
+    InterpreterOptions? options
+  }) async => await _create(file, null, null, debugName, options: options);
 
   /// Instantiates an isolate interpreter from a .tflite model as `Uint8List`
   static Future<IsolateInterpreter> createFromBuffer(Uint8List? buffer, {
     String debugName = 'TfLiteInterpreterIsolate',
-  }) async => await _create(null, buffer, null, debugName);
+    InterpreterOptions? options
+  }) async => await _create(null, buffer, null, debugName, options: options);
 
   /// Instantiates an isolate interpreter from an already existing interpreter's
   /// address
   static Future<IsolateInterpreter> createFromAddress(int? address, {
     String debugName = 'TfLiteInterpreterIsolate',
-  }) async => await _create(null, null, address, debugName);
+    InterpreterOptions? options
+  }) async => await _create(null, null, address, debugName, options: options);
 
   // Initialize the isolate and set up communication.
   Future<void> _init() async {
@@ -107,12 +117,17 @@ class IsolateInterpreter {
     
     // send the library paths
     _sendToIsolatePort.send(libTfLiteBasePath);
-    // TODO other libraries
+    _sendToIsolatePort.send(libTfLiteGPUDelegatePath);
+    _sendToIsolatePort.send(libTfLiteCoreMLDelegatePath);
+    _sendToIsolatePort.send(libTfLiteFlexDelegatePath);
+
+    // send the address of the `InterpreterOptions`
+    _sendToIsolatePort.send(isolateInterpreterOptionsAddress);
 
     // send the data to initialize the isolate
-    if(_file != null) _sendToIsolatePort.send(_file);
-    if(_buffer != null) _sendToIsolatePort.send(_buffer);
-    if(_address != null) _sendToIsolatePort.send(_address);
+    if(_fromFile != null) _sendToIsolatePort.send(_fromFile);
+    if(_fromBuffer != null) _sendToIsolatePort.send(_fromBuffer);
+    if(_fromAddress != null) _sendToIsolatePort.send(_fromAddress);
 
     // get the address of the interpreter in the isolate
     isolateInterpreterAddress = await isolateMessageQueue.next;
@@ -128,8 +143,19 @@ class IsolateInterpreter {
     sendToMainIsolatePort.send(port.sendPort);
 
     // get the paths to the tflite libraries
-    final baseLibPath = await receiveQueue.next;
-    initLiteRT(baseLibPath);
+    final baseLibPath           = await receiveQueue.next;
+    final gpuDelegateLibPath    = await receiveQueue.next;
+    final coreMLDelegateLibPath = await receiveQueue.next;
+    final flexDelegateLibPath   = await receiveQueue.next;
+    initLiteRT(baseLibPath,
+      gpuDelegatelibraryPath   : gpuDelegateLibPath,
+      coreMLDelegatelibraryPath: coreMLDelegateLibPath,
+      flexDelegatelibraryPath  : flexDelegateLibPath
+    );
+
+    // get `InterpreterOptions`
+    final int iOPA = await receiveQueue.next;
+    InterpreterOptions iO = InterpreterOptions.fromAddress(iOPA);
 
     // init interpreter in isolate
     late final Interpreter interpreter;
@@ -137,7 +163,7 @@ class IsolateInterpreter {
     // init from file
     if(d is File) interpreter = Interpreter.fromFile(d);
     // init from buffer
-    else if(d is Uint8List) interpreter = Interpreter.fromBuffer(d);
+    else if(d is Uint8List) interpreter = Interpreter.fromBuffer(d, options: iO);
     // init from address
     else if(d is int) interpreter = Interpreter.fromAddress(d);
 
@@ -166,10 +192,46 @@ class IsolateInterpreter {
     _isolate.kill();
   }
 
+  /// Returns the address of the current interpreter
+  Future<int> getAddress() async {
+
+    _sendToIsolatePort.send(InterpreterAttributeNames.address);
+
+    return (await isolateMessageQueue.next);
+
+  }
+
+  /// Returns the address of the current interpreter
+  Future<int> getIsAllocated() async {
+
+    _sendToIsolatePort.send(InterpreterAttributeNames.isAllocated);
+
+    return (await isolateMessageQueue.next);
+
+  }
+
+  /// Returns the address of the current interpreter
+  Future<int> getIsDeleted() async {
+
+    _sendToIsolatePort.send(InterpreterAttributeNames.isDeleted);
+
+    return (await isolateMessageQueue.next);
+
+  }
+
+  /// Returns the address of the current interpreter
+  Future<int> getLastNativeInferenceDurationMicroSeconds() async {
+
+    _sendToIsolatePort.send(InterpreterAttributeNames.lastNativeInferenceDurationMicroSeconds);
+
+    return (await isolateMessageQueue.next);
+
+  }
+
   /// Updates allocations for all tensors.
   Future<void> allocateTensors() async {
 
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.allocateTensors
     ));
 
@@ -181,7 +243,7 @@ class IsolateInterpreter {
   /// Runs inference for the loaded graph.
   Future<void> invoke() async {
 
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.invoke
     ));
 
@@ -191,7 +253,7 @@ class IsolateInterpreter {
 
   /// Run for single input and output
   Future<dynamic> run(Object input, Object output) async {
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.run,
       positionalArguments: [input, output]
     ));
@@ -202,7 +264,7 @@ class IsolateInterpreter {
   /// Run for multiple inputs and outputs
   Future<dynamic> runForMultipleInputs(
     List<Object> inputs, Map<int, Object> outputs) async {
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.runForMultipleInputs,
       positionalArguments: [inputs, outputs]
     ));
@@ -213,7 +275,7 @@ class IsolateInterpreter {
   /// Just run inference, without a result
   Future<void> runInference(List<Object> inputs) async {
     
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.runInference
     ));
 
@@ -224,7 +286,7 @@ class IsolateInterpreter {
   /// Gets all input tensors associated with the model.
   Future<List<Tensor>> getInputTensors() async {
 
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getInputTensors,
     ));
 
@@ -235,7 +297,7 @@ class IsolateInterpreter {
   /// Gets all output tensors associated with the model.
   Future<List<Tensor>> getOutputTensors() async {
     
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getOutputTensors,
     ));
 
@@ -247,7 +309,7 @@ class IsolateInterpreter {
   /// be called again afterward.
   Future<void> resizeInputTensor(int tensorIndex, List<int> shape) async {
         
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getOutputTensors,
     ));
 
@@ -258,7 +320,7 @@ class IsolateInterpreter {
   /// Gets the input Tensor for the provided input index.
   Future<Tensor> getInputTensor(int index) async {
     
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getInputTensor,
       positionalArguments: [index]
     ));
@@ -270,7 +332,7 @@ class IsolateInterpreter {
   /// Gets the output Tensor for the provided output index.
   Future<Tensor> getOutputTensor(int index) async {
     
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getOutputTensor,
       positionalArguments: [index]
     ));
@@ -282,7 +344,7 @@ class IsolateInterpreter {
   /// Gets index of an input given the op name of the input.
   Future<int> getInputIndex(String opName) async {
         
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getOutputTensor,
       positionalArguments: [opName]
     ));
@@ -294,7 +356,7 @@ class IsolateInterpreter {
   /// Gets index of an output given the op name of the output.
   Future<int> getOutputIndex(String opName) async {
         
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.getOutputTensor,
       positionalArguments: [opName]
     ));
@@ -306,7 +368,7 @@ class IsolateInterpreter {
   // Resets all variable tensors to the defaul value
   Future<void> resetVariableTensors() async {
             
-    _sendToIsolatePort.send(IsolateFunctionArguments(
+    _sendToIsolatePort.send(IsolateInterpreterFunctionArguments(
       name: InterpreterFunctionNames.resetVariableTensors,
     ));
 
