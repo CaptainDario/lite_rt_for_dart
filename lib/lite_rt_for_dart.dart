@@ -10,7 +10,7 @@ export 'src/delegates/gpu_delegate.dart';
 export 'src/delegates/metal_delegate.dart';
 export 'src/delegates/xnnpack_delegate.dart';
 export 'src/delegates/coreml_delegate.dart';
-export 'src/interpreter/interpreter.dart';
+export 'src/interpreter/native_interpreter.dart';
 export 'src/interpreter/isolate_interpreter.dart';
 export 'src/interpreter/interpreter_options.dart';
 export 'src/quanitzation_params.dart';
