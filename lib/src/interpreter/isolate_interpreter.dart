@@ -158,14 +158,14 @@ class IsolateInterpreter {
     InterpreterOptions iO = InterpreterOptions.fromAddress(iOPA);
 
     // init interpreter in isolate
-    late final Interpreter interpreter;
+    late final NativeInterpreter interpreter;
     final d = await receiveQueue.next;
     // init from file
-    if(d is File) interpreter = Interpreter.fromFile(d);
+    if(d is File) interpreter = NativeInterpreter.fromFile(d);
     // init from buffer
-    else if(d is Uint8List) interpreter = Interpreter.fromBuffer(d, options: iO);
+    else if(d is Uint8List) interpreter = NativeInterpreter.fromBuffer(d, options: iO);
     // init from address
-    else if(d is int) interpreter = Interpreter.fromAddress(d);
+    else if(d is int) interpreter = NativeInterpreter.fromAddress(d);
 
     // send the address of the interpreter to the main isolate
     sendToMainIsolatePort.send(interpreter.address);

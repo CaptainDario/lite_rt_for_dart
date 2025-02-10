@@ -50,7 +50,7 @@ class IsolateInterpreterFunctionArguments {
 
 /// Maps the given `IsolateFunctionArguments` to the call that it describes
 void mapNameToMember(
-  InterpreterAttributeNames iAN, Interpreter interpreter,
+  InterpreterAttributeNames iAN, NativeInterpreter interpreter,
   SendPort sendToMainIsolatePort){
   
   switch (iAN) {
@@ -71,7 +71,7 @@ void mapNameToMember(
 
 /// Maps the given `IsolateFunctionArguments` to the call that it describes
 void mapNameAndArgsToFunctionCall(
-  IsolateInterpreterFunctionArguments iFA, Interpreter interpreter,
+  IsolateInterpreterFunctionArguments iFA, NativeInterpreter interpreter,
   SendPort sendToMainIsolatePort){
 
   final args      = iFA.positionalArguments;

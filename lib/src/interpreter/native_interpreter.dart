@@ -31,7 +31,7 @@ import '../tensor.dart';
 
 
 /// TensorFlowLite interpreter for running inference on a model.
-class Interpreter {
+class NativeInterpreter {
   final Pointer<TfLiteInterpreter> _interpreter;
   bool _deleted = false;
   bool _allocated = false;
@@ -46,7 +46,7 @@ class Interpreter {
   int get lastNativeInferenceDurationMicroSeconds =>
       _lastNativeInferenceDurationMicroSeconds;
 
-  Interpreter._(this._interpreter) {
+  NativeInterpreter._(this._interpreter) {
     // Allocate tensors when interpreter is created
     allocateTensors();
   }
@@ -54,15 +54,15 @@ class Interpreter {
   /// Creates interpreter from model
   ///
   /// Throws [ArgumentError] is unsuccessful.
-  factory Interpreter._create(Model model, {InterpreterOptions? options}) {
+  factory NativeInterpreter._create(Model model, {InterpreterOptions? options}) {
     final interpreter = tfliteBinding.TfLiteInterpreterCreate(
         model.base, options?.base ?? cast<TfLiteInterpreterOptions>(nullptr));
     checkArgument(isNotNull(interpreter),
         message: 'Unable to create interpreter.');
-    return Interpreter._(interpreter);
+    return NativeInterpreter._(interpreter);
   }
 
-  /// Creates [Interpreter] from a model file
+  /// Creates [NativeInterpreter] from a model file
   ///
   /// Throws [ArgumentError] if unsuccessful.
   ///
@@ -82,9 +82,9 @@ class Interpreter {
   ///   return fileOnDevice;
   /// }
   /// ```
-  factory Interpreter.fromFile(File modelFile, {InterpreterOptions? options}) {
+  factory NativeInterpreter.fromFile(File modelFile, {InterpreterOptions? options}) {
     final model = Model.fromFile(modelFile.path);
-    final interpreter = Interpreter._create(model, options: options);
+    final interpreter = NativeInterpreter._create(model, options: options);
     model.delete();
     return interpreter;
   }
@@ -105,10 +105,10 @@ class Interpreter {
   ///       return rawBytes;
   ///   }
   /// ```
-  factory Interpreter.fromBuffer(Uint8List buffer,
+  factory NativeInterpreter.fromBuffer(Uint8List buffer,
       {InterpreterOptions? options}) {
     final model = Model.fromBuffer(buffer);
-    final interpreter = Interpreter._create(model, options: options);
+    final interpreter = NativeInterpreter._create(model, options: options);
     model.delete();
     return interpreter;
   }
@@ -118,10 +118,10 @@ class Interpreter {
   /// Creates interpreter from an address.
   ///
   /// Typically used for passing interpreter between isolates.
-  factory Interpreter.fromAddress(int address,
+  factory NativeInterpreter.fromAddress(int address,
       {bool allocated = false, bool deleted = false}) {
     final interpreter = Pointer<TfLiteInterpreter>.fromAddress(address);
-    return Interpreter._(interpreter)
+    return NativeInterpreter._(interpreter)
       .._deleted = deleted
       .._allocated = allocated;
   }
