@@ -17,7 +17,7 @@ void main() {
     print(tfliteBinding.TfLiteVersion().cast<Utf8>().toDartString());
 
     // load a model
-    NativeInterpreter i = NativeInterpreter.fromFile(File("mobilenet_quant.tflite"));
+    Interpreter i = Interpreter.fromFile(File("mobilenet_quant.tflite"));
     
     // prepare input / output
     final shape = [224, 224, 3];
