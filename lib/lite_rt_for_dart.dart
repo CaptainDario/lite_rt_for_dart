@@ -10,13 +10,17 @@ export 'src/delegates/gpu_delegate.dart';
 export 'src/delegates/metal_delegate.dart';
 export 'src/delegates/xnnpack_delegate.dart';
 export 'src/delegates/coreml_delegate.dart';
-export 'src/interpreter/native_interpreter.dart';
+export 'src/interpreter/interpreter.dart';
 export 'src/interpreter/isolate_interpreter.dart';
 export 'src/interpreter/interpreter_options.dart';
 export 'src/quanitzation_params.dart';
 export 'src/tensor.dart';
 export 'src/util/byte_conversion_utils.dart';
 export 'src/util/list_shape_extension.dart';
+
+import 'dart:io';
+
+import 'package:lite_rt_for_dart/src/bindings/bindings.dart';
 
 
 
@@ -87,5 +91,9 @@ void initLiteRT(String libraryPath, {
   _libTfLiteGPUDelegatePath    = gpuDelegatelibraryPath;
   _libTfLiteCoreMLDelegatePath = coreMLDelegatelibraryPath;
   _libTfLiteFlexDelegatePath   = flexDelegatelibraryPath;
+
+  if(Platform.isAndroid && _libTfLiteFlexDelegatePath != null){
+    initAndroidFlexDelegate(_libTfLiteFlexDelegatePath!);
+  }
 
 }

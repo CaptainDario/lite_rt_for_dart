@@ -19,6 +19,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
+import 'package:lite_rt_for_dart/src/delegates/flex_delegate_android.dart';
 import 'package:quiver/check.dart';
 import 'package:lite_rt_for_dart/src/bindings/bindings.dart';
 import 'package:lite_rt_for_dart/src/bindings/tensorflow_lite_bindings_generated.dart';
@@ -55,8 +56,16 @@ class Interpreter {
   ///
   /// Throws [ArgumentError] is unsuccessful.
   factory Interpreter._create(Model model, {InterpreterOptions? options}) {
+
+    // on all platfors except android the flex delegate is automatically loaded
+    // load it if on android
+    if(Platform.isAndroid && createdFlexDelegateAndroid){
+      if(options == null) options = InterpreterOptions();
+      options.addDelegate(FlexDelegateAndroid());
+    }
+
     final interpreter = tfliteBinding.TfLiteInterpreterCreate(
-        model.base, options?.base ?? cast<TfLiteInterpreterOptions>(nullptr));
+      model.base, options?.base ?? cast<TfLiteInterpreterOptions>(nullptr));
     checkArgument(isNotNull(interpreter),
         message: 'Unable to create interpreter.');
     return Interpreter._(interpreter);
@@ -321,4 +330,3 @@ class Interpreter {
 
   //TODO: (JAVA) void modifyGraphWithDelegate(Delegate delegate)
 }
-

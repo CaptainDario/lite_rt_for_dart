@@ -88,7 +88,7 @@ TensorFlowLiteBindings get tfliteGpuDelegateBinding {
 
     }
     catch (e) {
-      print("The given path: $libTfLiteGPUDelegatePath does not contain a valid TF Lite runtime!");
+      print("The given path: $libTfLiteGPUDelegatePath does not contain a valid GPU delegate!");
       throw Exception(e);
     }
   }
@@ -124,11 +124,51 @@ TensorFlowLiteBindings get tfliteCoreMLDelegateBinding {
 
     }
     catch (e) {
-      print("The given path: $libTfLiteCoreMLDelegatePath does not contain a valid TF Lite runtime!");
+      print("The given path: $libTfLiteCoreMLDelegatePath does not contain a valid CoreML delegate!");
       throw Exception(e);
     }
   }
 
   return _tfliteCoreMLDelegateBinding;
+
+}
+
+// android flex delegate bindings
+late DynamicLibrary _tfliteFlexDelegateLibrary;
+typedef _TfLite_flex_initTensorflow_native_t = Pointer<TfLiteDelegate> Function();
+late Pointer<TfLiteDelegate> Function() tfLite_flex_initTensorflow;
+typedef _TfLite_flex_createDelegate_native_t = Pointer<TfLiteDelegate> Function();
+late Pointer<TfLiteDelegate> Function() tfLite_flex_createDelegate;
+typedef _TfLite_flex_deleteDelegate_native_t = Void Function(
+    Pointer<TfLiteDelegate> delegate);
+late void Function(Pointer<TfLiteDelegate>) tfLite_flex_deleteDelegate;
+/// Has the flex delegate been created for android
+bool createdFlexDelegateAndroid = false;
+
+void initAndroidFlexDelegate(String libTfLiteFlexDelegatePath){
+
+  try {
+
+    _tfliteFlexDelegateLibrary = DynamicLibrary.open(libTfLiteFlexDelegatePath);
+
+    tfLite_flex_initTensorflow = _tfliteFlexDelegateLibrary
+      .lookup<NativeFunction<_TfLite_flex_initTensorflow_native_t>>(
+      'Java_org_tensorflow_lite_flex_FlexDelegate_nativeInitTensorFlow')
+      .asFunction();
+    tfLite_flex_createDelegate = _tfliteFlexDelegateLibrary
+      .lookup<NativeFunction<_TfLite_flex_createDelegate_native_t>>(
+      'Java_org_tensorflow_lite_flex_FlexDelegate_nativeCreateDelegate')
+      .asFunction();
+    tfLite_flex_deleteDelegate = _tfliteFlexDelegateLibrary
+      .lookup<NativeFunction<_TfLite_flex_deleteDelegate_native_t>>(
+      'Java_org_tensorflow_lite_flex_FlexDelegate_nativeDeleteDelegate')
+      .asFunction();
+
+    createdFlexDelegateAndroid = true;
+
+  }
+  catch (e) {
+    
+  }
 
 }
