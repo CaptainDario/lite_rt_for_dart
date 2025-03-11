@@ -14,6 +14,7 @@
 
 This plugin provides bindings for LiteRT (formerly TF lite) for standalone dart.
 If you want to use this in Flutter, consider [using the Flutter package](https://github.com/CaptainDario/lite_rt_for_flutter/releases).
+[Try it out in the browser!](https://captaindario.github.io/lite_rt_for_flutter/)
 
 ## Why another plugin?
 
