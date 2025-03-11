@@ -1,6 +1,6 @@
 
 # LiteRT For Dart
 
-## 1.0.0
+## 0.0.1
 
-* LiteRT (TF Lite) dart API
+* Test release
