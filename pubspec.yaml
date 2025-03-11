@@ -1,6 +1,6 @@
 name: lite_rt_for_dart
 description: Plugin to run tf lite models in dart apps.
-version: 1.0.0
+version: 0.0.1
 homepage: https://https://github.com/CaptainDario/lite_rt_for_dart
 
 environment:
@@ -10,6 +10,7 @@ dependencies:
   path: ^1.6.2
   quiver: ^3.0.0
   ffi: ^2.0.1
+  async: ^2.13.0
 
 dev_dependencies:
   ffigen: ^10.0.0
